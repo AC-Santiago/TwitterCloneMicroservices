@@ -1,0 +1,115 @@
+services:
+  bff_service:
+    build: ./bff_service
+    container_name: bff_service
+    ports:
+      - "8000:8000"
+    environment:
+      - AUTH_SERVICE_URL=http://auth_service:8001
+      - TWEET_SERVICE_URL=http://tweet_service:8002
+      - INTERACTION_SERVICE_URL=http://interaction_service:8003
+    depends_on:
+      - auth_service
+      # - tweet_service
+      # - interaction_service
+    networks:
+      - frontend_network
+      - backend_network
+
+  auth_service:
+    build: ./auth_service
+    container_name: auth_service
+    expose:
+      - "8001"
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGORITHM=${ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+    depends_on:
+      twitter_clone_db:
+        condition: service_healthy
+    networks:
+      - backend_network
+
+  # Microservicio de Tweets
+  # tweet_service:
+  #   build: ./tweet_service
+  #   container_name: tweet_service
+  #   expose:
+  #     - "8002"
+  #   environment:
+  #     - DB_HOST=twitter_clone_db
+  #     - DB_PORT=${DB_PORT}
+  #     - DB_NAME=tweet_db
+  #     - DB_USERNAME=${DB_USERNAME}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #   depends_on:
+  #     twitter_clone_db:
+  #       condition: service_healthy
+  #   networks:
+  #     - backend_network
+  #
+  # # Microservicio de Usuarios
+  # interaction_service:
+  #   build: ./interaction_service
+  #   container_name: interaction_service
+  #   expose:
+  #     - "8003"
+  #   environment:
+  #     - DB_HOST=twitter_clone_db
+  #     - DB_PORT=${DB_PORT}
+  #     - DB_NAME=user_db
+  #     - DB_USERNAME=${DB_USERNAME}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #   depends_on:
+  #     twitter_clone_db:
+  #       condition: service_healthy
+  #   networks:
+  #     - backend_network  
+
+  twitter_clone_db:
+    container_name: twitter_clone_db
+    image: postgres:16
+    expose:
+        - ${DB_PORT}
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - twitterclone_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+        - backend_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: fake@ejemplo.com  
+      PGADMIN_DEFAULT_PASSWORD: ejemplo
+    ports:
+      - "5050:80"   
+    depends_on:
+      - twitter_clone_db
+    networks:
+        - backend_network
+
+volumes:
+  twitterclone_db_data:
+
+networks:
+  frontend_network:    
+    driver: bridge
+  backend_network:     
+    driver: bridge
+
+
