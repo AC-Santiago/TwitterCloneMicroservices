@@ -1,57 +1,87 @@
 -- Crear tabla de usuarios
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
     full_name VARCHAR(100),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    biography TEXT DEFAULT '',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Crear índices para la tabla users
+CREATE INDEX idx_users_name ON users(name);
+CREATE INDEX idx_users_email ON users(email);
 
 -- Crear tabla de tweets
 CREATE TABLE tweets (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
-    content TEXT NOT NULL,
+    contenido TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Crear tabla de seguidores
-CREATE TABLE followers (
-    follower_id INTEGER NOT NULL,
-    following_id INTEGER NOT NULL,
+-- Crear tabla de comentarios
+CREATE TABLE comments (
+    id SERIAL PRIMARY KEY,
+    tweet_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    contenido TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (follower_id, following_id),
-    FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (following_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (tweet_id) REFERENCES tweets(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Crear tabla de likes
 CREATE TABLE likes (
-    user_id INTEGER NOT NULL,
     tweet_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id, tweet_id),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (tweet_id) REFERENCES tweets(id) ON DELETE CASCADE
+    PRIMARY KEY (tweet_id, user_id),
+    FOREIGN KEY (tweet_id) REFERENCES tweets(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Crear tabla de retweets
 CREATE TABLE retweets (
-    user_id INTEGER NOT NULL,
+    id SERIAL PRIMARY KEY,
     tweet_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id, tweet_id),
+    FOREIGN KEY (tweet_id) REFERENCES tweets(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (tweet_id) REFERENCES tweets(id) ON DELETE CASCADE
+    UNIQUE(tweet_id, user_id)
 );
 
--- Crear índices para mejorar el rendimiento
+-- Crear tabla de fotos de perfil
+CREATE TABLE profile_photos (
+    id SERIAL PRIMARY KEY,
+    file_path VARCHAR(255) NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    user_id INTEGER NOT NULL UNIQUE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Crear tabla de tokens en lista negra
+CREATE TABLE token_blacklist (
+    id SERIAL PRIMARY KEY,
+    token TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Crear índice para tokens en lista negra
+CREATE UNIQUE INDEX idx_token_blacklist_token ON token_blacklist(token);
+
+-- Crear índices adicionales para mejorar el rendimiento
 CREATE INDEX idx_tweets_user_id ON tweets(user_id);
+CREATE INDEX idx_tweets_created_at ON tweets(created_at);
+CREATE INDEX idx_comments_tweet_id ON comments(tweet_id);
+CREATE INDEX idx_comments_user_id ON comments(user_id);
 CREATE INDEX idx_likes_tweet_id ON likes(tweet_id);
+CREATE INDEX idx_likes_user_id ON likes(user_id);
 CREATE INDEX idx_retweets_tweet_id ON retweets(tweet_id);
-CREATE INDEX idx_followers_following_id ON followers(following_id);
+CREATE INDEX idx_retweets_user_id ON retweets(user_id);
+
 
