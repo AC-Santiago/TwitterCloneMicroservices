@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from utils.http_error_handler import HTTPErrorHandler
+from app.utils.http_error_handler import HTTPErrorHandler
 
 import httpx
 from typing import Dict, Any
@@ -20,13 +20,14 @@ app = FastAPI(
 
 # Configurar CORS
 app.add_middleware(
-    HTTPErrorHandler,
     CORSMiddleware,
     allow_origins=["*"],  # En producción, especificar los orígenes permitidos
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(HTTPErrorHandler)
 
 # URLs de los microservicios
 AUTH_SERVICE_URL = os.getenv("AUTH_SERVICE_URL", "http://localhost:8000")

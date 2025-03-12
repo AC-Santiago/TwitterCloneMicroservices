@@ -1,8 +1,7 @@
-import os
-
-from fastapi import FastAPI, HTTPException, Security, status
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import APIKeyHeader
+
+# from fastapi.security import APIKeyHeader
 from app.routers import auth, user
 from app.utils.http_error_handler import HTTPErrorHandler
 from app.database.connection import create_db_and_tables
@@ -14,18 +13,18 @@ app = FastAPI(
 )
 
 
-API_KEY = os.getenv("AUTH_SERVICE_API_KEY", "your-secret-api-key")
-api_key_header = APIKeyHeader(name="X-API-Key")
+# API_KEY = os.getenv("AUTH_SERVICE_API_KEY", "your-secret-api-key")
+# api_key_header = APIKeyHeader(name="X-API-Key")
 
 
-async def verify_api_key(api_key: str = Security(api_key_header)):
-    if api_key != API_KEY:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate API Key",
-        )
-    return api_key
-
+# async def verify_api_key(api_key: str = Security(api_key_header)):
+#     if api_key != API_KEY:
+#         raise HTTPException(
+#             status_code=status.HTTP_403_FORBIDDEN,
+#             detail="Could not validate API Key",
+#         )
+#     return api_key
+#
 
 # Configuración de CORS
 app.add_middleware(
@@ -38,7 +37,7 @@ app.add_middleware(
 
 app.add_middleware(HTTPErrorHandler)
 
-app.middleware("http")(verify_api_key)
+# app.middleware("http")(verify_api_key)
 
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(user.router, prefix="/api/users", tags=["Users"])
@@ -50,6 +49,6 @@ async def startup_event():
 
 
 @app.get("/health")
-async def health_check(api_key: str = Security(api_key_header)):
-    await verify_api_key(api_key)
+async def health_check():
+    # await verify_api_key(api_key)
     return {"status": "healthy", "service": "auth-service"}
