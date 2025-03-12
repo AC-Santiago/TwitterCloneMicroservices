@@ -3,11 +3,11 @@ from sqlmodel import Session
 from typing import Annotated, List
 from sqlmodel import select
 
-from crud.user import get_user_by_email, update_user_info
-from database.connection import get_session
-from models.user import Users
-from schemas.user import UserUpdate
-from utils.auth import decode_token
+from app.crud.user import get_user_by_email, update_user_info
+from app.database.connection import get_session
+from app.models.user import Users
+from app.schemas.user import UserUpdate
+from app.utils.auth import decode_token
 
 router = APIRouter()
 

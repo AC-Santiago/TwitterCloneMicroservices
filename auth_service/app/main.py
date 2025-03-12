@@ -3,9 +3,9 @@ import os
 from fastapi import FastAPI, HTTPException, Security, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import APIKeyHeader
-from routers import auth, user
-from utils.http_error_handler import HTTPErrorHandler
-from database.connection import create_db_and_tables
+from app.routers import auth, user
+from app.utils.http_error_handler import HTTPErrorHandler
+from app.database.connection import create_db_and_tables
 
 app = FastAPI(
     title="Auth Service",

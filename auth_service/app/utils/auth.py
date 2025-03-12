@@ -4,7 +4,8 @@ from typing import Annotated, Optional
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from fastapi import Depends
-from core.config import SettingsDepends
+
+from app.core.config import SettingsDepends
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 

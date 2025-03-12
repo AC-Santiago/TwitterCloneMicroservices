@@ -1,5 +1,5 @@
 [project]
-name = "TwitterClone"
+name = "TwitterClone-BFFService"
 version = "0.1.0"
 dependencies = [
     "annotated-types==0.7.0",
@@ -22,11 +22,9 @@ dependencies = [
     "markdown-it-py==3.0.0",
     "markupsafe==3.0.2",
     "mdurl==0.1.2",
-    "psycopg2-binary>=2.9.10",
     "pyasn1==0.4.8",
     "pydantic==2.10.6",
     "pydantic-core==2.27.2",
-    "pydantic-settings>=2.8.1",
     "pygments==2.19.1",
     "python-dotenv==1.0.1",
     "python-jose==3.4.0",

@@ -5,12 +5,12 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
 
-from crud.user import create_user, get_user_by_email
-from database.connection import get_session
-from models.user import Users
-from schemas.user import UserCreate
-from utils.auth import encode_token
-from utils.security import (
+from app.crud.user import create_user, get_user_by_email
+from app.database.connection import get_session
+from app.models.user import Users
+from app.schemas.user import UserCreate
+from app.utils.auth import encode_token
+from app.utils.security import (
     add_token_to_blacklist,
     is_token_blacklisted,
     verify_password,

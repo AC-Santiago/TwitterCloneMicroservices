@@ -1,9 +1,9 @@
 from typing import Annotated
 from fastapi import Depends
 from sqlmodel import SQLModel, Session, create_engine
-from core.config import SettingsDepends
+from app.core.config import get_settings
 
-settings = SettingsDepends
+settings = get_settings()
 engine = create_engine(settings.DATABASE_URL)
 
 

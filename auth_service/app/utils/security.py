@@ -1,7 +1,7 @@
 import bcrypt
 from sqlmodel import Session, select
 
-from models.token_blacklist import TokenBlacklist
+from app.models.token_blacklist import TokenBlacklist
 
 
 def get_password_hash(password: str) -> str:

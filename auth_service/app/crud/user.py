@@ -1,8 +1,8 @@
 from typing import Optional
 from sqlmodel import Session, select
-from models.user import Users
-from schemas.user import UserCreate
-from utils.security import get_password_hash
+from app.models.user import Users
+from app.schemas.user import UserCreate
+from app.utils.security import get_password_hash
 
 
 def get_user(db: Session, user_id: int):

@@ -1,5 +1,5 @@
 [project]
-name = "TwitterClone"
+name = "TwitterClone-AuthService"
 version = "0.1.0"
 dependencies = [
     "annotated-types==0.7.0",
