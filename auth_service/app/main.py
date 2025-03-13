@@ -13,19 +13,6 @@ app = FastAPI(
 )
 
 
-# API_KEY = os.getenv("AUTH_SERVICE_API_KEY", "your-secret-api-key")
-# api_key_header = APIKeyHeader(name="X-API-Key")
-
-
-# async def verify_api_key(api_key: str = Security(api_key_header)):
-#     if api_key != API_KEY:
-#         raise HTTPException(
-#             status_code=status.HTTP_403_FORBIDDEN,
-#             detail="Could not validate API Key",
-#         )
-#     return api_key
-#
-
 # Configuración de CORS
 app.add_middleware(
     CORSMiddleware,
@@ -37,18 +24,15 @@ app.add_middleware(
 
 app.add_middleware(HTTPErrorHandler)
 
-# app.middleware("http")(verify_api_key)
-
-app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
-app.include_router(user.router, prefix="/api/users", tags=["Users"])
+app.include_router(auth.router, prefix="/service_auth", tags=["Authentication"])
+app.include_router(user.router, prefix="/service_auth/users", tags=["Users"])
 
 
-@app.on_event("startup")
-async def startup_event():
-    create_db_and_tables()
+# @app.on_event("startup")
+# async def startup_event():
+#     create_db_and_tables()
 
 
 @app.get("/health")
 async def health_check():
-    # await verify_api_key(api_key)
     return {"status": "healthy", "service": "auth-service"}

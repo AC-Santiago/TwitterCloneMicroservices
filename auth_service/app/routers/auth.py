@@ -10,6 +10,7 @@ from app.database.connection import get_session
 from app.models.user import Users
 from app.schemas.user import UserCreate
 from app.utils.auth import encode_token
+from app.core.config import SettingsDepends
 from app.utils.security import (
     add_token_to_blacklist,
     is_token_blacklisted,
@@ -23,6 +24,7 @@ router = APIRouter()
 def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: Annotated[Session, Depends(get_session)],
+    settings: SettingsDepends,
 ):
 
     user = get_user_by_email(db=session, email=form_data.username)
@@ -35,7 +37,8 @@ def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = encode_token(
-        {"email": form_data.username, "full_name": user.full_name}
+        {"email": form_data.username, "full_name": user.full_name},
+        settings,
     )
     return JSONResponse(
         content={"access_token": access_token}, status_code=status.HTTP_200_OK
