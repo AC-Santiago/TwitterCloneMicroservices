@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.client import get_client, close_client
 from app.core.config import SettingsDepends
-from app.routers import auth
+from app.routers import auth, user
 from app.utils.http_error_handler import HTTPErrorHandler
 
 
@@ -39,7 +39,8 @@ async def read_root(settings: SettingsDepends):
     }
 
 
-app.include_router(auth.router, prefix="/service_auth", tags=["Authentication"])
+app.include_router(auth.router, prefix="/service_auth")
+app.include_router(user.router, prefix="/service_user")
 
 
 @app.on_event("startup")

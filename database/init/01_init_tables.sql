@@ -6,7 +6,6 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     full_name VARCHAR(100),
     biography TEXT DEFAULT '',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Crear índices para la tabla users
@@ -37,7 +36,6 @@ CREATE TABLE comments (
 CREATE TABLE likes (
     tweet_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (tweet_id, user_id),
     FOREIGN KEY (tweet_id) REFERENCES tweets(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -59,7 +57,6 @@ CREATE TABLE profile_photos (
     id SERIAL PRIMARY KEY,
     file_path VARCHAR(255) NOT NULL,
     file_name VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     user_id INTEGER NOT NULL UNIQUE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

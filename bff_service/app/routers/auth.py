@@ -1,7 +1,7 @@
-from typing import Annotated, Dict, Any
+from typing import Annotated
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Header
 
 from app.core.client import get_client
 from app.core.config import SettingsDepends
@@ -37,6 +37,21 @@ async def login(
             "password": form_data.password,
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    return JSONResponse(
+        content=response.json(), status_code=response.status_code
+    )
+
+
+@router.post("/auth/logout")
+async def logout(
+    authorization: Annotated[str, Header(..., alias="Authorization")],
+    settings: SettingsDepends,
+):
+    client = await get_client()
+    response = await client.post(
+        f"{settings.AUTH_SERVICE_URL}/service_auth/logout",
+        headers={"Authorization": authorization},
     )
     return JSONResponse(
         content=response.json(), status_code=response.status_code

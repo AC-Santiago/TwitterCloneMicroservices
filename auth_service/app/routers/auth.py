@@ -9,7 +9,7 @@ from app.crud.user import create_user, get_user_by_email
 from app.database.connection import get_session
 from app.models.user import Users
 from app.schemas.user import UserCreate
-from app.utils.auth import encode_token
+from app.utils.auth import decode_token, encode_token
 from app.core.config import SettingsDepends
 from app.utils.security import (
     add_token_to_blacklist,
@@ -81,3 +81,32 @@ def logout(
         )
     add_token_to_blacklist(db, token)
     return {"message": "Successfully logged out"}
+
+
+@router.get("/verify_token", tags=["auth"])
+def verify_token(
+    authorization: Annotated[str, Header(..., alias="Authorization")],
+    db: Annotated[Session, Depends(get_session)],
+    settings: SettingsDepends,
+):
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authorization header format",
+        )
+    token = authorization.split(" ")[1]
+    if is_token_blacklisted(db, token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has already"
+        )
+    info_token = decode_token(token, settings)
+    if not info_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
+        )
+    return JSONResponse(
+        {
+            "detail": "Token is valid",
+        },
+        status_code=status.HTTP_200_OK,
+    )

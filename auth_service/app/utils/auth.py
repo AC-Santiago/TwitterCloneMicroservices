@@ -32,6 +32,9 @@ def encode_token(
 def decode_token(
     token: Annotated[str, Depends(oauth2_scheme)], settings: SettingsDepends
 ) -> dict:
-    return jwt.decode(
-        token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-    )
+    try:
+        return jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+    except jwt.JWTError:
+        return None

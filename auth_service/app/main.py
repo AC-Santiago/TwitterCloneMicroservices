@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 # from fastapi.security import APIKeyHeader
 from app.routers import auth, user
 from app.utils.http_error_handler import HTTPErrorHandler
-from app.database.connection import create_db_and_tables
 
 app = FastAPI(
     title="Auth Service",
@@ -26,11 +25,6 @@ app.add_middleware(HTTPErrorHandler)
 
 app.include_router(auth.router, prefix="/service_auth", tags=["Authentication"])
 app.include_router(user.router, prefix="/service_auth/users", tags=["Users"])
-
-
-# @app.on_event("startup")
-# async def startup_event():
-#     create_db_and_tables()
 
 
 @app.get("/health")

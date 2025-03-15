@@ -1,7 +1,6 @@
-from typing import Optional
 from sqlmodel import Session, select
 from app.models.user import Users
-from app.schemas.user import UserCreate
+from app.schemas.user import UserCreate, UserUpdate
 from app.utils.security import get_password_hash
 
 
@@ -39,16 +38,22 @@ def change_picture(db: Session, user_id: int, file_path: str):
 def update_user_info(
     db: Session,
     user_id: int,
-    new_name: Optional[str] = None,
-    new_password: Optional[str] = None,
+    user_update: UserUpdate,
 ):
     user = db.exec(select(Users).where(Users.id == user_id)).first()
     if not user:
         return None
-    if new_name:
-        user.name = new_name
-    if new_password:
-        user.password = get_password_hash(new_password)
+
+    update_data = user_update.model_dump(exclude_unset=True)
+
+    if "password" in update_data:
+        password = update_data.pop("password")
+        user.password = get_password_hash(password)
+
+    # Actualizar el resto de campos
+    for field, value in update_data.items():
+        setattr(user, field, value)
+
     db.add(user)
     db.commit()
     db.refresh(user)
