@@ -18,7 +18,9 @@ def read_tweet(
 ):
     tweet = get_tweet(session, tweet_id)
     if not tweet:
-        raise HTTPException(status_code=404, detail="Tweet no existe")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Tweet no existe"
+        )
     return tweet
 
 

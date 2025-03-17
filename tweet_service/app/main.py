@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.utils.http_error_handler import HTTPErrorHandler
-from app.routers import tweet
+from app.routers import tweet, retweet
 
 app = FastAPI(
     title="Tweet Service",
@@ -21,6 +21,7 @@ app.add_middleware(
 app.add_middleware(HTTPErrorHandler)
 
 app.include_router(tweet.router)
+app.include_router(retweet.router)
 
 
 @app.get("/health")

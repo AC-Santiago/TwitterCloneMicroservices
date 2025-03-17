@@ -5,7 +5,7 @@ from sqlmodel import Field, Relationship, SQLModel
 class Tweets(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int
-    contenido: str
+    content: str
 
     retweets: list["Retweets"] = Relationship(back_populates="tweet")
 
