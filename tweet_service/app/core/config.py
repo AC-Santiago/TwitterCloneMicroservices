@@ -17,16 +17,18 @@ ROOT_DIR = find_root_path()
 
 
 class Settings(BaseSettings):
-    # Service URLs
-    AUTH_SERVICE_URL: str = "http://localhost:8001"
-    TWEET_SERVICE_URL: str = "http://localhost:8002"
-    INTERACTION_SERVICE_URL: str = "http://localhost:8003"
+    DB_HOST: str
+    DB_PORT: int
+    DB_NAME: str
+    DB_USERNAME: str
+    DB_PASSWORD: str
 
-    # HTTP Client settings
-    HTTP_TIMEOUT: float = 30.0
+    @property
+    def DATABASE_URL(self) -> str:
+        return f"postgresql://{self.DB_USERNAME}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     def to_dict(self) -> dict:
-        return self.model_dump()
+        return self.model_dump(exclude={"DB_PASSWORD", "SECRET_KEY"})
 
     class Config:
         env_file = [str(ROOT_DIR / ".env"), ".env"]

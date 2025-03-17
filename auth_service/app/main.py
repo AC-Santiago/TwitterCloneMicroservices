@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# from fastapi.security import APIKeyHeader
 from app.routers import auth, user
 from app.utils.http_error_handler import HTTPErrorHandler
 

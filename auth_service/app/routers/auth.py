@@ -37,7 +37,11 @@ def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = encode_token(
-        {"email": form_data.username, "full_name": user.full_name},
+        {
+            "uid": user.id,
+            "email": form_data.username,
+            "full_name": user.full_name,
+        },
         settings,
     )
     return JSONResponse(
@@ -105,8 +109,6 @@ def verify_token(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
         )
     return JSONResponse(
-        {
-            "detail": "Token is valid",
-        },
+        info_token,
         status_code=status.HTTP_200_OK,
     )

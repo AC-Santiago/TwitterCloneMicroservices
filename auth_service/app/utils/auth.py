@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated, Optional
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 
 from app.core.config import SettingsDepends
 
@@ -36,5 +36,7 @@ def decode_token(
         return jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
-    except jwt.JWTError:
-        return None
+    except jwt.JWTError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e)
+        )

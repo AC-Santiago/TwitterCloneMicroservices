@@ -32,4 +32,4 @@ async def verify_token(
             detail=response.json().get("detail"),
         )
 
-    return authorization
+    return response.json()

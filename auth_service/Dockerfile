@@ -1,4 +1,4 @@
-FROM python:3.11.11
+FROM python:3.11.11-slim
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
@@ -31,4 +31,3 @@ ENV PATH="/auth_service/.venv/bin:$PATH"
 EXPOSE 8001
 
 CMD ["fastapi", "run", "app/main.py", "--port", "8001"]
-# CMD [ "ls", "-la"]
