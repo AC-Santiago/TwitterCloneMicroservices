@@ -36,8 +36,8 @@ def create_tweets(
     user_id: int,
 ):
     tweet = TweetCreate(user_id=user_id, content=new_tweet.content)
-    create_tweet(session, tweet)
+    new_tweet_create = create_tweet(session, tweet)
     return JSONResponse(
-        {"message": "Tweet successfully created"},
+        content=new_tweet_create,
         status_code=status.HTTP_201_CREATED,
     )

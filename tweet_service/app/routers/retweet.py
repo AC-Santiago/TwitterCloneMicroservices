@@ -1,5 +1,6 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from sqlmodel import Session
 
 from app.crud.retweet import (
@@ -71,10 +72,12 @@ def create_retweet_end_point(
         )
     try:
         db_retweet = create_retweet(session, retweet)
-        print(f"Retweet created: {db_retweet}")
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Error: {e}",
         )
-    return db_retweet
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content=db_retweet,
+    )
