@@ -14,3 +14,4 @@ class TweetOut(TweetBase):
     id: int
     content: str = Field(max_length=280)
     user_name: str
+    created_at: str

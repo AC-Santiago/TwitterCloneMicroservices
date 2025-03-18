@@ -1,142 +1,128 @@
-from sqlmodel import Session, text
+from sqlmodel import Column, Integer, MetaData, Session, String, Table, select
 
-from app.models.tweet import Retweets
+from app.models.tweet import Retweets, Tweets
 from app.schemas.retweet import RetweetCreate
 
 
+def _validate_ids(*ids):
+    for id_value in ids:
+        if not isinstance(id_value, int) or id_value < 1:
+            raise ValueError("The ID must be a positive integer.")
+
+
+def _get_users_table():
+    metadata = MetaData()
+    return Table(
+        "users",
+        metadata,
+        Column("id", Integer, primary_key=True),
+        Column("name", String),
+    )
+
+
+def _format_retweet_response(row):
+    return {
+        "tweet_id": row.Retweets.tweet_id,
+        "tweet_content": row.tweet_content,
+        "author_name": row.author_name,
+        "retweeter_name": row.retweeter_name,
+        "created_at": row.Retweets.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
 def create_retweet(db: Session, retweet: RetweetCreate):
+    _validate_ids(retweet.user_id, retweet.tweet_id)
     db_retweet = Retweets(user_id=retweet.user_id, tweet_id=retweet.tweet_id)
     db.add(db_retweet)
     db.commit()
     db.refresh(db_retweet)
-    new_retweet = get_retweet(db, retweet.user_id, retweet.tweet_id)
-    return new_retweet
+    return get_retweet(db, retweet.user_id, retweet.tweet_id)
 
 
 def get_retweets_by_tweet(db: Session, tweet_id: int):
-    query = text(
-        """
-        SELECT 
-            r.tweet_id,
-            r.user_id,
-            u_retweeter.name as retweeter_name,
-            t.content as tweet_content,
-            u_author.name as author_name,
-            r.created_at
-        FROM retweets r
-        INNER JOIN users u_retweeter ON u_retweeter.id = r.user_id
-        INNER JOIN tweets t ON t.id = r.tweet_id
-        INNER JOIN users u_author ON u_author.id = t.user_id
-        WHERE r.tweet_id = :tweet_id
-        ORDER BY r.created_at DESC
-    """
+    _validate_ids(tweet_id)
+    retweeter = _get_users_table().alias("retweeter")
+    author = _get_users_table().alias("author")
+
+    query = (
+        select(
+            Retweets,
+            Tweets.content.label("tweet_content"),
+            retweeter.c.name.label("retweeter_name"),
+            author.c.name.label("author_name"),
+        )
+        .join(retweeter, retweeter.c.id == Retweets.user_id)
+        .join(Tweets, Tweets.id == Retweets.tweet_id)
+        .join(author, author.c.id == Tweets.user_id, isouter=True)
+        .where(Retweets.tweet_id == tweet_id)
+        .order_by(Retweets.created_at.desc())
     )
-    results = db.exec(query, params={"tweet_id": tweet_id})
-    return [
-        {
-            "tweet_id": row.tweet_id,
-            "tweet_content": row.tweet_content,
-            "author_name": row.author_name,
-            "retweeter_name": row.retweeter_name,
-            "created_at": row.created_at,
-        }
-        for row in results
-    ]
+
+    results = db.exec(query)
+    return [_format_retweet_response(row) for row in results]
 
 
 def get_retweets_by_user(db: Session, user_id: int):
-    if not isinstance(user_id, int) or user_id < 1:
-        raise ValueError("user_id debe ser un número entero positivo")
-    query = text(
-        """
-        SELECT 
-            r.tweet_id,
-            r.user_id,
-            u_retweeter.name as retweeter_name,
-            t.content as tweet_content,
-            u_author.name as author_name,
-            r.created_at
-        FROM retweets r
-        INNER JOIN users u_retweeter ON u_retweeter.id = r.user_id
-        INNER JOIN tweets t ON t.id = r.tweet_id
-        INNER JOIN users u_author ON u_author.id = t.user_id
-        WHERE r.user_id = :user_id
-        ORDER BY r.created_at DESC
-    """
+    _validate_ids(user_id)
+    retweeter = _get_users_table().alias("retweeter")
+    author = _get_users_table().alias("author")
+
+    query = (
+        select(
+            Retweets,
+            Tweets.content.label("tweet_content"),
+            retweeter.c.name.label("retweeter_name"),
+            author.c.name.label("author_name"),
+        )
+        .join(retweeter, retweeter.c.id == Retweets.user_id)
+        .join(Tweets, Tweets.id == Retweets.tweet_id)
+        .join(author, author.c.id == Tweets.user_id, isouter=True)
+        .where(Retweets.user_id == user_id)
+        .order_by(Retweets.created_at.desc())
     )
-    results = db.exec(query, params={"user_id": user_id})
-    return [
-        {
-            "tweet_id": row.tweet_id,
-            "tweet_content": row.tweet_content,
-            "author_name": row.author_name,
-            "retweeter_name": row.retweeter_name,
-            "created_at": row.created_at,
-        }
-        for row in results
-    ]
+
+    results = db.exec(query)
+    return [_format_retweet_response(row) for row in results]
 
 
 def get_retweet(db: Session, user_id: int, tweet_id: int):
-    if not isinstance(user_id, int) or user_id < 1:
-        raise ValueError("user_id debe ser un número entero positivo")
-    if not isinstance(tweet_id, int) or tweet_id < 1:
-        raise ValueError("tweet_id debe ser un número entero positivo")
+    _validate_ids(user_id, tweet_id)
+    retweeter = _get_users_table().alias("retweeter")
+    author = _get_users_table().alias("author")
 
-    query = text(
-        """
-        SELECT 
-            r.tweet_id,
-            r.user_id,
-            u_retweeter.name as retweeter_name,
-            t.content as tweet_content,
-            u_author.name as author_name,
-            r.created_at
-        FROM retweets r
-        INNER JOIN users u_retweeter ON u_retweeter.id = r.user_id
-        INNER JOIN tweets t ON t.id = r.tweet_id
-        INNER JOIN users u_author ON u_author.id = t.user_id
-        WHERE r.user_id = :user_id AND r.tweet_id = :tweet_id
-    """
+    query = (
+        select(
+            Retweets,
+            Tweets.content.label("tweet_content"),
+            retweeter.c.name.label("retweeter_name"),
+            author.c.name.label("author_name"),
+        )
+        .join(retweeter, retweeter.c.id == Retweets.user_id)
+        .join(Tweets, Tweets.id == Retweets.tweet_id)
+        .join(author, author.c.id == Tweets.user_id, isouter=True)
+        .where(Retweets.user_id == user_id, Retweets.tweet_id == tweet_id)
     )
-    results = db.exec(query, params={"user_id": user_id, "tweet_id": tweet_id})
-    result = results.first()
-    if result:
-        return {
-            "tweet_id": result.tweet_id,
-            "tweet_content": result.tweet_content,
-            "author_name": result.author_name,
-            "retweeter_name": result.retweeter_name,
-            "created_at": result.created_at,
-        }
-    return None
+
+    result = db.exec(query).first()
+    return _format_retweet_response(result) if result else None
 
 
 def get_retweets(db: Session):
-    query = text(
-        """
-        SELECT 
-            r.tweet_id,
-            r.user_id,
-            u_retweeter.name as retweeter_name,
-            t.content as tweet_content,
-            u_author.name as author_name,
-            r.created_at
-        FROM retweets r
-        INNER JOIN users u_retweeter ON u_retweeter.id = r.user_id
-        INNER JOIN tweets t ON t.id = r.tweet_id
-        INNER JOIN users u_author ON u_author.id = t.user_id
-        ORDER BY r.created_at DESC
-    """
+    retweeter = _get_users_table().alias("retweeter")
+    author = _get_users_table().alias("author")
+
+    query = (
+        select(
+            Retweets,
+            Tweets.content.label("tweet_content"),
+            retweeter.c.name.label("retweeter_name"),
+            author.c.name.label("author_name"),
+        )
+        .join(retweeter, retweeter.c.id == Retweets.user_id)
+        .join(Tweets, Tweets.id == Retweets.tweet_id)
+        .join(author, author.c.id == Tweets.user_id, isouter=True)
+        .order_by(Retweets.created_at.desc())
     )
+
     results = db.exec(query)
-    return [
-        {
-            "tweet_id": row.tweet_id,
-            "tweet_content": row.tweet_content,
-            "author_name": row.author_name,
-            "retweeter_name": row.retweeter_name,
-            "created_at": row.created_at,
-        }
-        for row in results
-    ]
+    return [_format_retweet_response(row) for row in results]

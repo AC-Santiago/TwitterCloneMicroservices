@@ -6,20 +6,19 @@ from sqlmodel import Session
 
 from app.crud.tweet import create_tweet, get_tweet, get_tweets
 from app.database.connection import get_session
-from app.models.tweet import Tweets
-from app.schemas.tweet import TweetCreate, TweetBase, TweetOut
+from app.schemas.tweet import TweetBase, TweetCreate, TweetOut
 
 router = APIRouter()
 
 
-@router.get("/tweets/{tweet_id}", tags=["Tweets"], response_model=Tweets)
+@router.get("/tweets/{tweet_id}", tags=["Tweets"], response_model=TweetOut)
 def read_tweet(
     tweet_id: int, session: Annotated[Session, Depends(get_session)]
 ):
     tweet = get_tweet(session, tweet_id)
     if not tweet:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Tweet no existe"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Tweet not found"
         )
     return tweet
 
