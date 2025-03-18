@@ -40,6 +40,19 @@ def read_retweets(session: Session = Depends(get_session)):
     return retweets
 
 
+@router.get("/retweets/user/{user_id}", tags=["Retweets"])
+def read_retweets_by_user(
+    user_id: int, session: Annotated[Session, Depends(get_session)]
+):
+    retweets = get_retweets_by_user(session, user_id)
+    if not retweets:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Retweets not found",
+        )
+    return retweets
+
+
 @router.post("/retweet/", tags=["Retweets"])
 def create_retweet_end_point(
     retweet: RetweetCreate, session: Annotated[Session, Depends(get_session)]
@@ -58,6 +71,7 @@ def create_retweet_end_point(
         )
     try:
         db_retweet = create_retweet(session, retweet)
+        print(f"Retweet created: {db_retweet}")
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
