@@ -9,6 +9,7 @@ from app.crud.tweet import (
     get_tweet,
     get_tweets,
     get_tweets_by_user,
+    get_tweets_retweets_all,
     get_tweets_retweeted_by_user,
 )
 from app.database.connection import get_session
@@ -44,6 +45,12 @@ def read_tweets_by_user(user_id: int, session: Session = Depends(get_session)):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Tweets not found"
         )
+    return tweets
+
+
+@router.get("/tweets/retweets/", tags=["Tweets"])
+def reda_tweets_retweets_all(session: Annotated[Session, Depends(get_session)]):
+    tweets = get_tweets_retweets_all(session)
     return tweets
 
 
