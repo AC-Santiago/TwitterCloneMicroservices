@@ -22,11 +22,14 @@ def _get_users_table():
 
 def _format_retweet_response(row):
     return {
-        "tweet_id": row.Retweets.tweet_id,
-        "tweet_content": row.tweet_content,
-        "author_name": row.author_name,
         "retweeter_name": row.retweeter_name,
         "created_at": row.Retweets.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        "tweet": {
+            "id_tweet": row.Retweets.tweet_id,
+            "author_name": row.author_name,
+            "content": row.tweet_content,
+            "created_at": row.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        },
     }
 
 
@@ -48,6 +51,7 @@ def get_retweets_by_tweet(db: Session, tweet_id: int):
         select(
             Retweets,
             Tweets.content.label("tweet_content"),
+            Tweets.created_at,
             retweeter.c.name.label("retweeter_name"),
             author.c.name.label("author_name"),
         )
@@ -71,6 +75,7 @@ def get_retweets_by_user(db: Session, user_id: int):
         select(
             Retweets,
             Tweets.content.label("tweet_content"),
+            Tweets.created_at,
             retweeter.c.name.label("retweeter_name"),
             author.c.name.label("author_name"),
         )
@@ -94,6 +99,7 @@ def get_retweet(db: Session, user_id: int, tweet_id: int):
         select(
             Retweets,
             Tweets.content.label("tweet_content"),
+            Tweets.created_at,
             retweeter.c.name.label("retweeter_name"),
             author.c.name.label("author_name"),
         )
@@ -115,6 +121,7 @@ def get_retweets(db: Session):
         select(
             Retweets,
             Tweets.content.label("tweet_content"),
+            Tweets.created_at,
             retweeter.c.name.label("retweeter_name"),
             author.c.name.label("author_name"),
         )

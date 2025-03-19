@@ -1,5 +1,6 @@
 from sqlmodel import Column, Integer, Session, String, Table, select, MetaData
 
+from app.crud.retweet import get_retweets_by_user
 from app.models.tweet import Tweets
 from app.schemas.tweet import TweetCreate
 
@@ -25,10 +26,23 @@ def _get_users_table():
     )
 
 
-def get_tweet(db: Session, tweet_id: int):
-    if not isinstance(tweet_id, int) or tweet_id < 1:
+def _validate_id(id: int):
+    if not isinstance(id, int) or id < 1:
         raise ValueError("The tweet ID must be a positive integer.")
 
+
+def get_tweets_retweeted_by_user(db: Session, user_id: int):
+    _validate_id(user_id)
+    tweets_by_user = get_tweets_by_user(db, user_id)
+    retweets = get_retweets_by_user(db, user_id)
+
+    tweets_retweeted = tweets_by_user + retweets
+    tweets_retweeted.sort(key=lambda x: x["created_at"], reverse=True)
+    return tweets_retweeted
+
+
+def get_tweet(db: Session, tweet_id: int):
+    _validate_id(tweet_id)
     users = _get_users_table().alias("users")
 
     tweet_query = db.exec(
