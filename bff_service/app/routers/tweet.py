@@ -36,6 +36,20 @@ async def get_tweets(
     )
 
 
+@router.get("/tweets/user/{user_id}")
+async def get_tweets_by_user(
+    user_id: int,
+    settings: SettingsDepends,
+):
+    client = await get_client()
+    response = await client.get(
+        f"{settings.TWEET_SERVICE_URL}/tweets/user/{user_id}",
+    )
+    return JSONResponse(
+        content=response.json(), status_code=response.status_code
+    )
+
+
 @router.post("/tweet/")
 async def create_tweet(
     tweet_data: TweetBase,

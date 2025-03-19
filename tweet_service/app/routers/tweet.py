@@ -4,7 +4,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlmodel import Session
 
-from app.crud.tweet import create_tweet, get_tweet, get_tweets
+from app.crud.tweet import (
+    create_tweet,
+    get_tweet,
+    get_tweets,
+    get_tweets_by_user,
+)
 from app.database.connection import get_session
 from app.schemas.tweet import TweetBase, TweetCreate, TweetOut
 
@@ -26,6 +31,18 @@ def read_tweet(
 @router.get("/tweets/", tags=["Tweets"], response_model=List[TweetOut])
 def read_tweets(session: Session = Depends(get_session)):
     tweets = get_tweets(session)
+    return tweets
+
+
+@router.get(
+    "/tweets/user/{user_id}", tags=["Tweets"], response_model=List[TweetOut]
+)
+def read_tweets_by_user(user_id: int, session: Session = Depends(get_session)):
+    tweets = get_tweets_by_user(session, user_id)
+    if not tweets:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Tweets not found"
+        )
     return tweets
 
 

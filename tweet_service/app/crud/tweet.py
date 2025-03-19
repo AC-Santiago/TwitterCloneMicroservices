@@ -41,7 +41,14 @@ def get_tweet(db: Session, tweet_id: int):
 
 
 def get_tweets_by_user(db: Session, user_id: int):
-    return db.exec(select(Tweets).where(Tweets.user_id == user_id)).all()
+    users = _get_users_table().alias("users")
+    results = db.exec(
+        select(Tweets, users.c.name.label("user_name"))
+        .join(users, users.c.id == Tweets.user_id)
+        .where(Tweets.user_id == user_id)
+        .order_by(Tweets.id.desc())
+    )
+    return [_format_tweet_response(row) for row in results]
 
 
 def create_tweet(db: Session, tweet: TweetCreate):

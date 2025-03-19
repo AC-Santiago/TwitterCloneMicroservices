@@ -36,6 +36,20 @@ async def get_retweets(
     )
 
 
+@router.get("/retweets/user/{user_id}")
+async def get_retweets_by_user(
+    user_id: int,
+    settings: SettingsDepends,
+):
+    client = await get_client()
+    response = await client.get(
+        f"{settings.TWEET_SERVICE_URL}/retweets/user/{user_id}",
+    )
+    return JSONResponse(
+        content=response.json(), status_code=response.status_code
+    )
+
+
 @router.post("/retweet/")
 async def create_retweet(
     retweet_data: RetweetCreate,
