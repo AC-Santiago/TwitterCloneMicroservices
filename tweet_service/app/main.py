@@ -26,4 +26,4 @@ app.include_router(retweet.router)
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "auth-service"}
+    return {"status": "healthy", "service": "tweet-service"}

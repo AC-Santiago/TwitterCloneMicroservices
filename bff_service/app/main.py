@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.client import get_client, close_client
 from app.core.config import SettingsDepends
-from app.routers import auth, tweet, user, retweet
+from app.routers import auth, tweet, user, retweet, like
 from app.utils.http_error_handler import HTTPErrorHandler
 
 
@@ -18,7 +18,7 @@ app = FastAPI(
 # Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # En producción, especificar los orígenes permitidos
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -43,6 +43,7 @@ app.include_router(auth.router, prefix="/service_auth")
 app.include_router(user.router, prefix="/service_user")
 app.include_router(tweet.router, prefix="/service_tweet")
 app.include_router(retweet.router, prefix="/service_tweet")
+app.include_router(like.router, prefix="/service_interaction")
 
 
 @app.on_event("startup")
