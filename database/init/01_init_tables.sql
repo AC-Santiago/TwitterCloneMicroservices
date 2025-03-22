@@ -26,7 +26,7 @@ CREATE TABLE comments (
     id SERIAL PRIMARY KEY,
     tweet_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
-    contenido TEXT NOT NULL,
+    content TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (tweet_id) REFERENCES tweets(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -48,15 +48,6 @@ CREATE TABLE retweets (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (tweet_id, user_id),
     FOREIGN KEY (tweet_id) REFERENCES tweets(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
--- Crear tabla de fotos de perfil
-CREATE TABLE profile_photos (
-    id SERIAL PRIMARY KEY,
-    file_path VARCHAR(255) NOT NULL,
-    file_name VARCHAR(255) NOT NULL,
-    user_id INTEGER NOT NULL UNIQUE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
