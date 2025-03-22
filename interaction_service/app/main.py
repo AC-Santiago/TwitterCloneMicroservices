@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.utils.http_error_handler import HTTPErrorHandler
-from app.routers import like
+from app.routers import comment, like
 
 app = FastAPI(
     title="Interaction Service",
@@ -21,6 +21,7 @@ app.add_middleware(
 app.add_middleware(HTTPErrorHandler)
 
 app.include_router(like.router)
+app.include_router(comment.router)
 
 
 @app.get("/health")
