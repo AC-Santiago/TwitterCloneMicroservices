@@ -1,6 +1,7 @@
 [project]
 name = "TwitterClone-TweetService"
 version = "0.1.0"
+requires-python = ">=3.11"
 dependencies = [
     "annotated-types==0.7.0",
     "anyio==4.8.0",
