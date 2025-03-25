@@ -43,6 +43,40 @@ TwitterCloneMicroservices/
 └── uv.lock              # Lock file de dependencias
 ```
 
+### Estructura de un servicio:
+
+Esta es la estructura de carpetas de cada servicio, en donde solo varian el contenido de estas, cada una maneja sus dependencias, de manera individual.
+```
+.
+├── app
+│   ├── core
+│   │   ├── config.py
+│   │   └── __init__.py
+│   ├── crud
+│   │   └── __init__.py
+│   ├── database
+│   │   ├── connection.py
+│   │   └── __init__.py
+│   ├── __init__.py
+│   ├── main.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   └── ...
+│   ├── routers
+│   │   ├── __init__.py
+│   │   └── ...
+│   ├── schemas
+│   │   ├── __init__.py
+│   │   └── ...
+│   └── utils
+│       ├── http_error_handler.py
+│       ├── __init__.py
+│       └── ...
+├── Dockerfile
+├── pyproject.toml
+└── uv.lock
+```
+
 ## 🚀 Microservicios
 
 El proyecto está dividido en los siguientes microservicios:
@@ -92,7 +126,7 @@ Para comenzar a desarrollar:
 2. Instala uv: En su documentacion se explicampo como se instala [uv-docs](https://docs.astral.sh/uv/getting-started/installation/#installation-methods)
 3. Para cada servicio:
    - Navega al directorio del servicio
-   - Crea un entorno virtual: `uv venv .venv --python 3.11`
+   - Crea un entorno virtual: `uv venv .venv --python=3.11`
    - Activa el entorno virtual: `source .venv/bin/activate`
    - Instala las dependencias: `uv sync`
 
