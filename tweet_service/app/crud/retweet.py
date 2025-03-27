@@ -133,3 +133,13 @@ def get_retweets(db: Session):
 
     results = db.exec(query)
     return [_format_retweet_response(row) for row in results]
+
+
+def delete_retweet(db: Session, user_id: int, tweet_id: int):
+    _validate_ids(user_id, tweet_id)
+    retweet = db.get(Retweets, (user_id, tweet_id))
+    if retweet:
+        db.delete(retweet)
+        db.commit()
+        return True
+    return False

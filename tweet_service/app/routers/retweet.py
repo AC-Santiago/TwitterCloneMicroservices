@@ -1,10 +1,11 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import JSONResponse
 from sqlmodel import Session
 
 from app.crud.retweet import (
     create_retweet,
+    delete_retweet,
     get_retweet,
     get_retweets,
     get_retweets_by_tweet,
@@ -96,3 +97,24 @@ def create_retweet_end_point(
         status_code=status.HTTP_201_CREATED,
         content=db_retweet,
     )
+
+
+@router.delete("/retweet/{user_id}/{tweet_id}", tags=["Retweets"])
+def delete_retweet_endpoint(
+    user_id: int,
+    tweet_id: int,
+    session: Annotated[Session, Depends(get_session)],
+):
+    retweet = get_retweet(session, user_id, tweet_id)
+    if not retweet:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Retweet not found",
+        )
+    status_deleted = delete_retweet(session, user_id, tweet_id)
+    if not status_deleted:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error deleting retweet",
+        )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
