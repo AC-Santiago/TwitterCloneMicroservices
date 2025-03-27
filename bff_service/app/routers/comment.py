@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from app.core.auth import verify_token
 from app.core.client import get_client

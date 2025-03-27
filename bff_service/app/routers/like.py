@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from app.core.auth import verify_token
 from app.core.client import get_client
 from app.core.config import SettingsDepends
-from app.schemas.like import LikeCreate, LikeBase
+from app.schemas.like import LikeCreate
 
 router = APIRouter(tags=["likes"])
 
@@ -56,15 +56,15 @@ async def create_like(
     )
 
 
-@router.delete("/like/")
+@router.delete("/like/{tweet_id}")
 async def delete_like(
-    like: LikeBase,
+    tweet_id: int,
     authorization: Annotated[dict, Depends(verify_token)],
     settings: SettingsDepends,
 ):
     client = await get_client()
     response = await client.delete(
-        f"{settings.INTERACTION_SERVICE_URL}/like/{like.tweet_id}/{authorization.get('uid')}",
+        f"{settings.INTERACTION_SERVICE_URL}/like/{tweet_id}/{authorization.get('uid')}",
     )
     if response.status_code == 404:
         return JSONResponse(

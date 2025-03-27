@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import JSONResponse
 from sqlmodel import Session
 
@@ -79,7 +79,4 @@ def delete_like_endpoint(
             user_id=like_query["user_id"], tweet_id=like_query["tweet_id"]
         ),
     )
-    return JSONResponse(
-        content={"detail": "Like deleted successfully."},
-        status_code=status.HTTP_204_NO_CONTENT,
-    )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

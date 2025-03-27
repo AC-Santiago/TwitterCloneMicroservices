@@ -21,10 +21,6 @@ def read_comments_by_tweet(
     tweet_id: int, session: Annotated[Session, Depends(get_session)]
 ):
     comments_query = get_comments_by_tweet(session, tweet_id)
-    if not comments_query:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="No comments found."
-        )
     return comments_query
 
 

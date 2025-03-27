@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from app.core.auth import verify_token
 from app.core.client import get_client
 from app.core.config import SettingsDepends
-from app.schemas.retweet import RetweetBase, RetweetCreate
+from app.schemas.retweet import RetweetCreate
 
 router = APIRouter(tags=["retweets"])
 
@@ -69,15 +69,15 @@ async def create_retweet(
     )
 
 
-@router.delete("/retweet/")
+@router.delete("/retweet/{tweet_id}")
 async def delete_retweet(
-    retweet_data: RetweetBase,
+    tweet_id: int,
     authorization: Annotated[dict, Depends(verify_token)],
     settings: SettingsDepends,
 ):
     client = await get_client()
     response = await client.delete(
-        f"{settings.TWEET_SERVICE_URL}/retweet/{authorization.get('uid')}/{retweet_data.tweet_id}",
+        f"{settings.TWEET_SERVICE_URL}/retweet/{authorization.get('uid')}/{tweet_id}",
     )
     return Response(
         status_code=response.status_code,
