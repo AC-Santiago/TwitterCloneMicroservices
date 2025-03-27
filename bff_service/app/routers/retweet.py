@@ -69,7 +69,7 @@ async def create_retweet(
     )
 
 
-@router.delete("/retweet/{tweet_id}")
+@router.delete("/retweet/")
 async def delete_retweet(
     retweet_data: RetweetBase,
     authorization: Annotated[dict, Depends(verify_token)],
