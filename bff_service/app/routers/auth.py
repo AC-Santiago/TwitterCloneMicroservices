@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, Header
-
+from app.core.auth import verify_token
 from app.core.client import get_client
 from app.core.config import SettingsDepends
 from app.schemas.auth import UserCreate
@@ -41,6 +41,13 @@ async def login(
     return JSONResponse(
         content=response.json(), status_code=response.status_code
     )
+
+
+@router.get("/auth/verify_token")
+async def verify_token(
+    authorization: Annotated[dict, Depends(verify_token)],
+):
+    return authorization
 
 
 @router.post("/auth/logout")
