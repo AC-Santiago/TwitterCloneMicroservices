@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from sqlmodel import Session
 
 from app.crud.retweet import (
+    count_retweets_by_tweet,
     create_retweet,
     delete_retweet,
     get_retweet,
@@ -68,6 +69,17 @@ def read_retweet(
             detail="Retweet not found",
         )
     return retweet
+
+
+@router.get("/retweets/count/tweet/{tweet_id}")
+def get_count_retweets_by_tweet(
+    tweet_id: int, session: Annotated[Session, Depends(get_session)]
+):
+    count_retweets = count_retweets_by_tweet(session, tweet_id)
+    return JSONResponse(
+        content={"total_retweets": count_retweets},
+        status_code=status.HTTP_200_OK,
+    )
 
 
 @router.post("/retweet/", tags=["Retweets"])

@@ -1,4 +1,13 @@
-from sqlmodel import Column, Integer, MetaData, Session, String, Table, select
+from sqlmodel import (
+    Column,
+    Integer,
+    MetaData,
+    Session,
+    String,
+    Table,
+    func,
+    select,
+)
 
 from app.models.tweet import Retweets, Tweets
 from app.schemas.retweet import RetweetCreate
@@ -143,3 +152,11 @@ def delete_retweet(db: Session, user_id: int, tweet_id: int):
         db.commit()
         return True
     return False
+
+
+def count_retweets_by_tweet(db: Session, tweet_id: int):
+    _validate_ids(tweet_id)
+    total_retweets = db.exec(
+        select(func.count()).where(Retweets.tweet_id == tweet_id)
+    ).one()
+    return total_retweets
