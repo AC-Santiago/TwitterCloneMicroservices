@@ -9,6 +9,7 @@ from app.crud.like import (
     delete_like,
     get_like,
     get_likes_by_tweet,
+    get_likes_by_user,
 )
 from app.database.connection import get_session
 from app.schemas.like import LikeBase, LikeCreate
@@ -25,6 +26,19 @@ def read_likes_by_tweet(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="No likes found."
         )
+    return likes_query
+
+
+@router.get("/like/user/{user_id}")
+def read_likes_by_user(
+    user_id: int, session: Annotated[Session, Depends(get_session)]
+):
+    likes_query = get_likes_by_user(session, user_id)
+    if not likes_query:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No likes found."
+        )
+    print(likes_query)
     return likes_query
 
 

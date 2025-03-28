@@ -29,6 +29,18 @@ def _get_users_table():
     )
 
 
+def _get_tweets_table():
+    metadata = MetaData()
+    return Table(
+        "tweets",
+        metadata,
+        Column("id", Integer, primary_key=True),
+        Column("content", String),
+        Column("created_at", String),
+        Column("user_id", Integer),
+    )
+
+
 def _format_like_response(row):
     if not row:
         return None
@@ -36,6 +48,17 @@ def _format_like_response(row):
         "user_name": row.user_name,
         "user_id": row.Likes.user_id,
         "tweet_id": row.Likes.tweet_id,
+    }
+
+
+def _format_tweet_response(row):
+    if not row:
+        return None
+    return {
+        "id": row.id,
+        "content": row.content,
+        "created_at": row.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        "user_name": row.user_name,
     }
 
 
@@ -63,7 +86,15 @@ def get_likes_by_tweet(db: Session, tweet_id: int):
 
 
 def get_likes_by_user(db: Session, user_id: int):
-    return db.exec(select(Likes).where(Likes.user_id == user_id)).all()
+    tweets = _get_tweets_table().alias("tweets")
+    users = _get_users_table().alias("users")
+    likes = db.exec(
+        select(Likes, tweets, users.c.name.label("user_name"))
+        .join(tweets, tweets.c.id == Likes.tweet_id)
+        .join(users, users.c.id == Likes.user_id)
+        .where(Likes.user_id == user_id)
+    ).all()
+    return [_format_tweet_response(like) for like in likes]
 
 
 def count_likes_by_tweet(tweet_id: int, session: Session):

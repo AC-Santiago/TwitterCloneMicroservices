@@ -37,6 +37,20 @@ async def count_likes_by_tweet(
     )
 
 
+@router.get("/likes/user/{user_id}")
+async def get_likes_by_user(
+    user_id: int,
+    settings: SettingsDepends,
+):
+    client = await get_client()
+    response = await client.get(
+        f"{settings.INTERACTION_SERVICE_URL}/like/user/{user_id}",
+    )
+    return JSONResponse(
+        content=response.json(), status_code=response.status_code
+    )
+
+
 @router.post("/like")
 async def create_like(
     like_data: LikeCreate,

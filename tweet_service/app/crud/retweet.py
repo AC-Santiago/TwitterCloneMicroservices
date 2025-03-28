@@ -34,7 +34,7 @@ def _format_retweet_response(row):
         "retweeter_name": row.retweeter_name,
         "created_at": row.Retweets.created_at.strftime("%Y-%m-%d %H:%M:%S"),
         "tweet": {
-            "id_tweet": row.Retweets.tweet_id,
+            "id": row.Retweets.tweet_id,
             "author_name": row.author_name,
             "content": row.tweet_content,
             "created_at": row.created_at.strftime("%Y-%m-%d %H:%M:%S"),
