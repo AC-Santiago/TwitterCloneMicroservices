@@ -38,7 +38,6 @@ def read_likes_by_user(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="No likes found."
         )
-    print(likes_query)
     return likes_query
 
 

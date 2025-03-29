@@ -58,7 +58,8 @@ def _format_tweet_response(row):
         "id": row.id,
         "content": row.content,
         "created_at": row.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-        "user_name": row.user_name,
+        "user_name": row.author_name,
+        "author_name": row.user_name,
     }
 
 
@@ -88,10 +89,17 @@ def get_likes_by_tweet(db: Session, tweet_id: int):
 def get_likes_by_user(db: Session, user_id: int):
     tweets = _get_tweets_table().alias("tweets")
     users = _get_users_table().alias("users")
+    tweet_authors = _get_users_table().alias("tweet_authors")
     likes = db.exec(
-        select(Likes, tweets, users.c.name.label("user_name"))
+        select(
+            Likes,
+            tweets,
+            users.c.name.label("user_name"),
+            tweet_authors.c.name.label("author_name"),
+        )
         .join(tweets, tweets.c.id == Likes.tweet_id)
         .join(users, users.c.id == Likes.user_id)
+        .join(tweet_authors, tweet_authors.c.id == tweets.c.user_id)
         .where(Likes.user_id == user_id)
     ).all()
     return [_format_tweet_response(like) for like in likes]
